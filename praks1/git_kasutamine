@@ -1,0 +1,82 @@
+GIT KASUTAMINE
+
+1. Git paigaldamine root kasutajana:
+
+apt-get update
+apt-get install git
+
+
+2. Git seadistamine tavakasutajana:
+
+git config --global user.name "karelkangur"
+git config --global user.email "karel-markus.kangur@voco.ee"
+git config --global core.editor nano
+
+
+3. Git seadistuse kontroll:
+
+git config --global user.name
+git config --global user.email
+git config --global core.editor
+
+
+4. Lokaalse repositooriumi loomine:
+
+mkdir skriptimine
+cd skriptimine
+git init
+
+
+5. GitHub remote ühenduse lisamine:
+
+git remote add origin git@github.com:karelkangur/linux_skriptimine.git
+
+
+6. Remote ühenduse kontroll:
+
+git remote -v
+
+
+7. SSH ühenduse kontroll GitHubiga:
+
+ssh -T git@github.com
+
+
+8. Git põhikasutamine:
+
+Faili lisamine jälgimisele:
+
+git add failinimi
+
+Kõikide muudatuste lisamine:
+
+git add .
+
+Muudatuste kontroll:
+
+git status
+
+Commiti tegemine:
+
+git commit -m "muudatuse kirjeldus"
+
+Muudatuste saatmine GitHubi:
+
+git push -u origin main
+
+Edaspidi piisab:
+
+git push
+
+
+9. GitHubist viimaste muudatuste tõmbamine:
+
+git pull
+
+
+10. Tavaline tööjärjekord:
+
+git status
+git add .
+git commit -m "muudatuse kirjeldus"
+git push
