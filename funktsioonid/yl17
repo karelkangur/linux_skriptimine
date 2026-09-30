@@ -1,0 +1,14 @@
+#!/bin/bash
+
+kontroll() {
+    if [ ! -f "$1" ]; then
+        echo "Faili pole."
+        return 1
+    fi
+
+    echo "Fail leitud."
+}
+
+kontroll "/tmp/test.txt"
+
+echo "Skript jätkab tööd."

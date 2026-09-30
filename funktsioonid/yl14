@@ -1,0 +1,14 @@
+#!/bin/bash
+
+kontrolli_faili() {
+    if [ ! -f "$1" ]; then
+        echo "Faili ei leitud!"
+        return 1
+    fi
+
+    echo "Fail on olemas."
+    return 0
+}
+
+kontrolli_faili "/etc/passwd"
+kontrolli_faili "/fail-mida-ei-ole"

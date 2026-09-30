@@ -1,0 +1,15 @@
+#!/bin/bash
+
+hello() {
+    echo "Hello!"
+}
+
+hello
+
+# Probleemne variant oleks:
+# hello
+# hello() {
+#     echo "Hello!"
+# }
+#
+# Bash ei tunneks esimese hello käsu ajal funktsiooni veel.

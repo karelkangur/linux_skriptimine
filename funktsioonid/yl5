@@ -1,0 +1,21 @@
+#!/bin/bash
+
+hello() {
+    echo "Tere tulemast!"
+}
+
+hello
+hello
+hello
+
+echo
+echo "Funktsioon tsüklist:"
+
+tervita() {
+    echo "Tere!"
+}
+
+for i in {1..5}
+do
+    tervita
+done
