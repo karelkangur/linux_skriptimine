@@ -1,160 +1,184 @@
 #!/bin/bash
 
-# Lihtne lotomäng
+# Lihtne lotomäng funktsioonidega
 
-# Mängija ja loosinumbrite failid tühjendatakse iga mängu alguses
-> player_numbers.txt
-> lottery_numbers.txt
+PLAYER_FILE="player_numbers.txt"
+LOTTERY_FILE="lottery_numbers.txt"
+RESULTS_FILE="results.txt"
 
-# Küsime mängija nime
-read -p "Sisesta mängija nimi: " player_name
-
-if [ -z "$player_name" ]; then
-    player_name="Unknown"
-fi
-
-echo
-echo "Sisesta 5 erinevat numbrit vahemikus 1-50."
-echo
-
-# -------------------------
-# Mängija numbrite sisestamine
-# -------------------------
-
-count=0
-
-while [ "$count" -lt 5 ]; do
-
-    read -p "Sisesta number $((count + 1)): " number
-
-    # Kontroll: midagi peab olema sisestatud
-    if [ -z "$number" ]; then
-        echo "Viga: number jäi sisestamata."
-        continue
-    fi
-
-    # Kontroll: peab olema täisarv
-    if ! [[ "$number" =~ ^[0-9]+$ ]]; then
-        echo "Viga: sisesta täisarv."
-        continue
-    fi
-
-    # Kontroll: peab olema vahemikus 1-50
-    if [ "$number" -lt 1 ] || [ "$number" -gt 50 ]; then
-        echo "Viga: number peab olema vahemikus 1-50."
-        continue
-    fi
-
-    # Kontroll: sama numbrit ei tohi kaks korda sisestada
-    if grep -qx "$number" player_numbers.txt; then
-        echo "Viga: number $number on juba valitud."
-        continue
-    fi
-
-    # Salvestame korrektse numbri
-    echo "$number" >> player_numbers.txt
-    count=$((count + 1))
-
-done
-
-echo
-echo "Mängija valitud numbrid:"
-cat player_numbers.txt
-
-# -------------------------
-# Lotonumbrite loosimine
-# -------------------------
-
-count=0
-
-while [ "$count" -lt 5 ]; do
-
-    lottery_number=$((RANDOM % 50 + 1))
-
-    # Kui number on juba loositud, proovime uuesti
-    if grep -qx "$lottery_number" lottery_numbers.txt; then
-        continue
-    fi
-
-    echo "$lottery_number" >> lottery_numbers.txt
-    count=$((count + 1))
-
-done
-
-echo
-echo "Võidunumbrid:"
-cat lottery_numbers.txt
-
-# -------------------------
-# Tulemuste kontrollimine
-# -------------------------
-
-echo
-echo "Tulemuste kontroll:"
-echo
-
+player_name=""
 matches=0
+result=""
 
-while read -r number; do
+show_header() {
+    echo "=============================="
+    echo "          LOTO MÄNG"
+    echo "=============================="
+    echo
+}
 
-    echo "Kontrollin numbrit $number..."
+clear_files() {
+    > "$PLAYER_FILE"
+    > "$LOTTERY_FILE"
+}
 
-    if grep -qx "$number" lottery_numbers.txt; then
-        echo "TABAMUS!"
-        matches=$((matches + 1))
-    else
-        echo "Ei tabanud."
+read_player() {
+    read -p "Sisesta mängija nimi: " player_name
+
+    if [ -z "$player_name" ]; then
+        player_name="Unknown"
     fi
+}
+
+read_player_numbers() {
+    local count=0
+    local number
 
     echo
+    echo "Sisesta 5 erinevat numbrit vahemikus 1-50."
+    echo
 
-done < player_numbers.txt
+    while [ "$count" -lt 5 ]; do
 
-echo "Mängija: $player_name"
-echo "Tabamusi: $matches / 5"
+        read -p "Sisesta number $((count + 1)): " number
 
-# -------------------------
-# Hinnang tulemusele
-# -------------------------
+        if [ -z "$number" ]; then
+            echo "Viga: number jäi sisestamata."
+            continue
+        fi
 
-case $matches in
-    5)
-        result="JACKPOT!"
-        ;;
-    4)
-        result="Väga hea tulemus!"
-        ;;
-    3)
-        result="Hea tulemus."
-        ;;
-    2)
-        result="Kaks tabamust."
-        ;;
-    1)
-        result="Üks tabamus."
-        ;;
-    0)
-        result="Seekord tabamusi ei olnud."
-        ;;
-esac
+        if ! [[ "$number" =~ ^[0-9]+$ ]]; then
+            echo "Viga: sisesta täisarv."
+            continue
+        fi
 
-echo "$result"
+        if [ "$number" -lt 1 ] || [ "$number" -gt 50 ]; then
+            echo "Viga: number peab olema vahemikus 1-50."
+            continue
+        fi
 
-# -------------------------
-# Tulemuse salvestamine
-# -------------------------
+        if grep -qx "$number" "$PLAYER_FILE"; then
+            echo "Viga: number $number on juba valitud."
+            continue
+        fi
 
-{
-    echo "========================================"
-    echo "Date: $(date)"
-    echo "Player: $player_name"
-    echo "Player numbers:"
-    cat player_numbers.txt
-    echo "Lottery numbers:"
-    cat lottery_numbers.txt
-    echo "Matches: $matches"
-    echo "Result: $result"
-} >> results.txt
+        echo "$number" >> "$PLAYER_FILE"
+        count=$((count + 1))
 
-echo
-echo "Tulemus salvestati faili results.txt."
+    done
+}
+
+show_player_numbers() {
+    echo
+    echo "Mängija valitud numbrid:"
+    cat "$PLAYER_FILE"
+}
+
+generate_lottery_numbers() {
+    local count=0
+    local lottery_number
+
+    while [ "$count" -lt 5 ]; do
+
+        lottery_number=$((RANDOM % 50 + 1))
+
+        if grep -qx "$lottery_number" "$LOTTERY_FILE"; then
+            continue
+        fi
+
+        echo "$lottery_number" >> "$LOTTERY_FILE"
+        count=$((count + 1))
+
+    done
+}
+
+show_lottery_numbers() {
+    echo
+    echo "Võidunumbrid:"
+    cat "$LOTTERY_FILE"
+}
+
+check_matches() {
+    local number
+
+    matches=0
+
+    echo
+    echo "Tulemuste kontroll:"
+    echo
+
+    while read -r number; do
+
+        echo "Kontrollin numbrit $number..."
+
+        if grep -qx "$number" "$LOTTERY_FILE"; then
+            echo "TABAMUS!"
+            matches=$((matches + 1))
+        else
+            echo "Ei tabanud."
+        fi
+
+        echo
+
+    done < "$PLAYER_FILE"
+}
+
+set_result() {
+    case $matches in
+        5)
+            result="JACKPOT!"
+            ;;
+        4)
+            result="Väga hea tulemus!"
+            ;;
+        3)
+            result="Hea tulemus."
+            ;;
+        2)
+            result="Kaks tabamust."
+            ;;
+        1)
+            result="Üks tabamus."
+            ;;
+        0)
+            result="Seekord tabamusi ei olnud."
+            ;;
+    esac
+}
+
+show_result() {
+    echo "Mängija: $player_name"
+    echo "Tabamusi: $matches / 5"
+    echo "$result"
+}
+
+save_result() {
+    {
+        echo "========================================"
+        echo "Date: $(date)"
+        echo "Player: $player_name"
+        echo "Player numbers:"
+        cat "$PLAYER_FILE"
+        echo "Lottery numbers:"
+        cat "$LOTTERY_FILE"
+        echo "Matches: $matches"
+        echo "Result: $result"
+    } >> "$RESULTS_FILE"
+
+    echo
+    echo "Tulemus salvestati faili $RESULTS_FILE."
+}
+
+# Programmi põhiosa
+
+show_header
+clear_files
+read_player
+read_player_numbers
+show_player_numbers
+generate_lottery_numbers
+show_lottery_numbers
+check_matches
+set_result
+show_result
+save_result
