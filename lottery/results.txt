@@ -15,3 +15,37 @@ Lottery numbers:
 49
 Matches: 1
 Result: Üks tabamus.
+========================================
+Date: Wed Oct  7 05:50:30 AM UTC 2026
+Player: karel
+Player numbers:
+5
+4
+3
+2
+1
+Lottery numbers:
+37
+18
+42
+46
+31
+Matches: 0
+Result: Seekord tabamusi ei olnud.
+========================================
+Date: Wed Oct  7 05:54:32 AM UTC 2026
+Player: karel
+Player numbers:
+49
+38
+12
+34
+22
+Lottery numbers:
+27
+35
+7
+38
+26
+Matches: 1
+Result: Üks tabamus.
