@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Kasutajate lisamine failist
+
+if [ $# -ne 1 ]; then
+    echo "Kasutamine: $0 failinimi"
+    exit 1
+fi
+
+failinimi="$1"
+
+if [ ! -f "$failinimi" ]; then
+    echo "Viga: faili $failinimi ei leitud."
+    exit 1
+fi
+
+while read -r nimi; do
+
+    if [ -n "$nimi" ]; then
+       ./lisa_kasutaja "$nimi"
+    fi
+
+done < "$failinimi"

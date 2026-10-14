@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Kontroll: skripti võib käivitada ainult päris root kasutaja
+if [ "$(id -u)" -ne 0 ] || [ -n "${SUDO_USER:-}" ]; then
+    echo "Sul ei ole õigust antud skripti käivitamiseks!"
+    exit 1
+fi
+
+# Kasutajate loomine automaatselt genereeritud paroolidega
+
+if [ $# -ne 1 ]; then
+    echo "Kasutamine: $0 kasutajate_fail"
+    exit 1
+fi
+
+kasutajate_fail="$1"
+logifail="loodud_kasutajad_paroolidega"
+
+if [ ! -f "$kasutajate_fail" ]; then
+    echo "Viga: faili $kasutajate_fail ei leitud."
+    exit 1
+fi
+
+# Tühjendame eelmise logifaili
+> "$logifail"
+
+while read -r kasutajanimi; do
+
+    if [ -z "$kasutajanimi" ]; then
+        continue
+    fi
+
+    # Genereerime 8 märgi pikkuse parooli
+    parool=$(pwgen -s 8 1)
+
+    # Loome kasutaja
+    useradd -m -s /bin/bash "$kasutajanimi"
+
+    if [ $? -eq 0 ]; then
+
+        # Määrame parooli
+        echo "$kasutajanimi:$parool" | chpasswd
+
+        # Salvestame kasutajanime ja parooli logifaili
+        echo "$kasutajanimi:$parool" >> "$logifail"
+
+        echo "Kasutaja $kasutajanimi loodud."
+
+    else
+        echo "Viga kasutaja $kasutajanimi loomisel."
+    fi
+
+done < "$kasutajate_fail"
+
+echo
+echo "Loodud kasutajad ja paroolid:"
+cat "$logifail"

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Kasutajate loomine kahe eraldi faili põhjal
+
+if [ $# -ne 2 ]; then
+    echo "Kasutamine: $0 kasutajate_fail paroolide_fail"
+    exit 1
+fi
+
+kasutajate_fail="$1"
+paroolide_fail="$2"
+
+if [ ! -f "$kasutajate_fail" ]; then
+    echo "Viga: kasutajate faili ei leitud."
+    exit 1
+fi
+
+if [ ! -f "$paroolide_fail" ]; then
+    echo "Viga: paroolide faili ei leitud."
+    exit 1
+fi
+
+exec 3< "$paroolide_fail"
+
+while read -r kasutajanimi; do
+
+    read -r parool <&3
+
+    if [ -z "$kasutajanimi" ] || [ -z "$parool" ]; then
+        continue
+    fi
+
+    useradd -m -s /bin/bash "$kasutajanimi"
+
+    if [ $? -eq 0 ]; then
+        echo "$kasutajanimi:$parool" | chpasswd
+        echo "Kasutaja $kasutajanimi lisatud koos parooliga."
+    else
+        echo "Viga kasutaja $kasutajanimi lisamisel."
+    fi
+
+done < "$kasutajate_fail"
+
+exec 3<&-

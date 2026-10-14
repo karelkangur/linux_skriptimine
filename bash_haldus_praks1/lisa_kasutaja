@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Kasutaja lisamise skript
+
+if [ $# -ne 1 ]; then
+    echo "Kasutamine: $0 kasutajanimi"
+    exit 1
+fi
+
+kasutajanimi="$1"
+
+# Kontrollime, kas kasutaja juba eksisteerib
+if id "$kasutajanimi" >/dev/null 2>&1; then
+    echo "Viga: kasutaja $kasutajanimi on juba olemas."
+    exit 1
+fi
+
+# Loome kasutaja koos kodukataloogi ja Bash shelliga
+useradd -m -s /bin/bash "$kasutajanimi"
+
+if [ $? -eq 0 ]; then
+    echo "Kasutaja $kasutajanimi on lisatud süsteemi."
+    echo
+    echo "Kasutaja info:"
+    grep "^$kasutajanimi:" /etc/passwd
+
+    echo
+    echo "Kodukataloog:"
+    ls -la "/home/$kasutajanimi"
+else
+    echo "Probleem kasutaja $kasutajanimi lisamisega."
+    exit 1
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Kasutajate lisamine failist koos paroolidega
+
+if [ $# -ne 1 ]; then
+    echo "Kasutamine: $0 failinimi"
+    exit 1
+fi
+
+failinimi="$1"
+
+if [ ! -f "$failinimi" ]; then
+    echo "Viga: faili $failinimi ei leitud."
+    exit 1
+fi
+
+while IFS=: read -r kasutajanimi parool; do
+
+    if [ -z "$kasutajanimi" ] || [ -z "$parool" ]; then
+        continue
+    fi
+
+    useradd -m -s /bin/bash "$kasutajanimi"
+
+    if [ $? -eq 0 ]; then
+        echo "$kasutajanimi:$parool" | chpasswd
+        echo "Kasutaja $kasutajanimi lisatud koos parooliga."
+    else
+        echo "Viga kasutaja $kasutajanimi lisamisel."
+    fi
+
+done < "$failinimi"
